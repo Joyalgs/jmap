@@ -1,14 +1,157 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Google OAuth Login Example</title>
-  <meta name="google-signin-client_id" content="710047983875-tr00btn4355sri0t7f5e6l1i9u9l3k7k.apps.googleusercontent.com">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JMap</title>
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+  <meta name="google-signin-client_id"
+    content="710047983875-tr00btn4355sri0t7f5e6l1i9u9l3k7k.apps.googleusercontent.com">
   <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <style>
+    /* Set the size of the map */
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Login with Google</h1>
+  <h4>Login with Google</h4>
   <div id="google-signin-button" class="g-signin2" data-onsuccess="onSignIn"></div>
+  <br>
+
+  <h3 class="label label-info">Users Online : <span class="badge" id="count"></span></h3>
+  <br>
+  <br>
+  <!-- Map container -->
+  <div id="map"></div>
+
+  <!-- Include the Google Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBk66ls_gX8z9dqJcDHPqAEJR_oseMdv9c&callback=initMap"
+    async defer></script>
+
   <script>
+    // Initialize and display the map
+    function initMap() {
+      // Create a new map instance
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15, // Set the initial zoom level
+        center: { lat: 0, lng: 0 } // Center the map at the beginning
+      });
+
+
+      // Check if the user's location is already stored in sessionStorage
+      var storedLocation = sessionStorage.getItem('userLocation');
+
+      // if (storedLocation) {
+
+      //     console.log(storedLocation);
+      //     var loc = JSON.parse(storedLocation);
+
+      //     console.log(loc);
+
+      //     for (let i = 0; i < loc.length; i++) {
+
+      //         // Parse the stored location data
+      //         var pos = JSON.parse(loc[i]);
+
+      //         // Create a marker at the stored location
+      //         var marker = new google.maps.Marker({
+      //             position: pos,
+      //             map: map,
+      //             title: 'Your Location from cache'
+      //         });
+
+      //         // Center the map on the stored location
+      //         map.setCenter(pos);
+      //     }
+
+
+      // } else {
+      // Try HTML5 geolocation to get the user's current position
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          // Create a new LatLng object with the retrieved coordinates
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          var userLocation;
+
+          if (storedLocation) {
+            userLocation = JSON.parse(storedLocation);
+          }
+          else {
+            userLocation = [];
+          }
+
+          userLocation.push(pos);
+
+          // Store the user's location in sessionStorage
+          sessionStorage.setItem('userLocation', JSON.stringify(userLocation));
+
+
+
+          // // Create a marker at the user's current position
+          // var marker = new google.maps.Marker({
+          //     position: pos,
+          //     map: map,
+          //     title: 'User ' + Math.floor(Math.random() * 100)
+          // });
+
+          // // Center the map on the user's current position
+          // map.setCenter(pos);
+
+          for (let i = 0; i < userLocation.length; i++) {
+
+            // Parse the stored location data
+            var pos = userLocation[i];
+
+            // Create a marker at the stored location
+            var marker = new google.maps.Marker({
+              position: pos,
+              map: map,
+              title: 'User ' + Math.floor(Math.random() * 100)
+            });
+
+            // Center the map on the stored location
+            map.setCenter(pos);
+
+            document.getElementById('count').innerHTML = i + 1;
+          }
+
+
+
+        }, function () {
+          // Handle geolocation errors
+          handleLocationError(true, map.getCenter());
+        });
+      } else {
+        // Browser doesn't support geolocation
+        handleLocationError(false, map.getCenter());
+      }
+    }
+    // }
+
+    // Function to handle geolocation errors
+    function handleLocationError(browserHasGeolocation, pos) {
+      var infoWindow = new google.maps.InfoWindow({
+        map: map,
+        position: pos,
+        content: browserHasGeolocation ?
+          'Error: The Geolocation service failed.' :
+          'Error: Your browser doesn\'t support geolocation.'
+      });
+    }
+
     function onSignIn(googleUser) {
       alert('Login success');
       // The user is signed in, you can now access the user's profile information
@@ -22,6 +165,8 @@
       // For example, you can send the user's ID and email to your server for authentication
       // Note: Always validate the user's identity on your server to ensure security
     }
+
   </script>
 </body>
+
 </html>
