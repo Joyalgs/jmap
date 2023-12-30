@@ -10,6 +10,7 @@
   <div id="google-signin-button" class="g-signin2" data-onsuccess="onSignIn"></div>
   <script>
     function onSignIn(googleUser) {
+      alert('Login success');
       // The user is signed in, you can now access the user's profile information
       var profile = googleUser.getBasicProfile();
       console.log('ID: ' + profile.getId()); // Do not send this directly to your server!
